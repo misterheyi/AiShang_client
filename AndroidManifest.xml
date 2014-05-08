@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aishang.app"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
+    </uses-permission>
+
+    <application
+        android:name="com.aishang.app.AiShangApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Black.NoTitleBar" >
+
+        <!-- 登录界面 -->
+        <activity
+            android:name="com.aishang.app.ui.activity.LoginActivity"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                 <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.HOME_FIRST" />
+                <category android:name="android.intent.category.MONKEY" /> 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- 主界面 -->
+        <activity
+            android:name="com.aishang.app.ui.activity.MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
+        <!-- 店内推荐 -->
+        <activity
+            android:name="com.aishang.app.ui.activity.PriceListActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <!-- 发型秀 -->
+        <activity
+            android:name="com.aishang.app.ui.activity.HairShowActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <!-- 发现详情页面 -->
+        <activity
+            android:name="com.aishang.app.ui.activity.HairInfoActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <!-- 视频播放 -->
+        <activity
+            android:name="com.aishang.app.ui.activity.VideoPlayerActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <!-- 后台下载 -->
+        <service android:name="com.aishang.app.service.DownloadService" >
+        </service>
+        <!-- 自动播放 -->
+        <service android:name="com.aishang.app.service.PlayADService" >
+        </service>
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="53341c0756240b439f021c14" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="AISHANG" />
+    </application>
+
+</manifest>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="sex">
+        <item>不限</item>
+        <item>男性</item>
+        <item>女性</item>
+    </string-array>
+    <string-array name="area">
+        <item>不限</item>
+        <item>亚洲</item>
+        <item>欧洲</item>
+    </string-array>
+    <string-array name="style">
+        <item>不限</item>
+        <item>活泼可爱</item>
+        <item>端庄典雅</item>
+        <item>优雅时尚</item>
+        <item>新锐个性</item>
+        <item>盘发扎发</item>
+    </string-array>
+    <string-array name="height">
+        <item>不限</item>
+        <item>长</item>
+        <item>中</item>
+        <item>短</item>
+    </string-array>
+
+</resources>

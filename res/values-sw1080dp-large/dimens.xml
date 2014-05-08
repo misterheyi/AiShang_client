@@ -1,0 +1,10 @@
+<resources>
+
+    <dimen name="title_height">135px</dimen>
+    <dimen name="logo_height">100dp</dimen>
+    <dimen name="logo_width">210dp</dimen>
+    <dimen name="im_height">270px</dimen>
+    <dimen name="im_width">202px</dimen>
+    <dimen name="btn_PriceList">600px</dimen>
+
+</resources>

@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">爱尚网</string>
+    <string name="price_list">店内推荐</string>
+    <string name="hair_show">发型秀</string>
+    <string name="live_tv">直播</string>
+    <string name="demand">点播</string>
+
+</resources>
