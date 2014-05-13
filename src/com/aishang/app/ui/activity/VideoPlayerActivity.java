@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -44,20 +45,19 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 
 	private BitmapUtils bitmapUtil;
 	private Handler handler;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d("VideoPlayerActivity", "onCreate");
 		setContentView(R.layout.activity_player);
-		getApp().setPlaying(true);
 
+		getApp().setPlaying(true);
 		isClick = getIntent().getBooleanExtra("isClick", false);
 		status = getIntent().getIntExtra("status", 0);
 		type = getIntent().getIntExtra("type", 0);
-
 		mVideoView = (VideoView) findViewById(R.id.videoView);
 		mImageView = (ImageView) findViewById(R.id.adView);
-
+		
 		bitmapUtil= new BitmapUtils(getApplicationContext());
 		mVideoView.setOnCompletionListener(this);
 		mVideoView.requestFocus();
@@ -112,17 +112,16 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 			return;
 		}
 		videos = getApp().getVideoByType(type);
-		picturePosition++;
 		if (picturePosition >= pictures.size()) {
 			picturePosition = 0;
 		}
-
 		AdPicture adPicture = pictures.get(picturePosition);
 		getApp().playScrollPicture(adPicture.getAdPicture_id());
 		bitmapUtil.display(mImageView, bce + adPicture.getAdPicture_path());
 		now_play_stats = PICTURE;
 		mImageView.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.GONE);
+		picturePosition++;
 
 		handler.postDelayed(new Runnable() {
 
@@ -147,13 +146,19 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
+		Log.d("VideoPlayerActivity", "onCompletion");
 		switch (now_play_stats) {
 		case VIDEO:
 			if (isClick) {
-				getApp().setPlayAD(false);
-				startAction();
-			} else
+				playPosition++;
+				if(playPosition == videos.size()){
+					startAction();
+					return;
+				}
+				play();
+			} else{
 				playPicture();
+			}
 			break;
 		case PICTURE:
 			replayVideo();
@@ -163,20 +168,11 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	}
 
 	public void replayVideo() {
-		if (isClick) {
-			getApp().setPlayAD(false);
-			startAction();
-		} else {
-			playPosition++;
-			if (playPosition >= videos.size()) {
-				playPosition = 0;
-			}
-			if (getApp().isPlayAD()) {
-				playPosition = 0;
-				videos = getApp().getVideoByType(1);
-			}
-			play();
+		playPosition++;
+		if (playPosition >= videos.size()) {
+			playPosition = 0;
 		}
+		play();
 	}
 
 	@Override
@@ -191,6 +187,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 
 	@Override
 	protected void onDestroy() {
+		Log.d("VideoPlayerActivity", "onDestroy");
 		getApp().setPlaying(false);
 		getApp().setPriceListDTO(null);
 		super.onDestroy();
@@ -214,6 +211,8 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 			getApp().setSoft("com.togic.livevideo");
 			break;
 		}
+		getApp().setPlaying(false);
+		getApp().setPlayAD(false);
 		finish();
 	}
 
