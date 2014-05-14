@@ -89,7 +89,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 				startAction();
 			} else {
 				finish();
-				startDownload(videos.get(playPosition));
+				//startDownload(videos.get(playPosition));
 			}
 		} else {
 			mVideoView.setVideoPath(videos.get(playPosition).getFilePath());

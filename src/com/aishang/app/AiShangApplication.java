@@ -64,6 +64,7 @@ public class AiShangApplication extends Application implements Constants {
 		super.onCreate();
 		http = new HttpUtils();
 		db = DbUtils.create(this, "aishang");
+		downLoadList = new ArrayList<DownloadItem>();
 		mPreferenceUtil = new PreferenceUtil(getApplicationContext());
 	}
 
@@ -428,6 +429,7 @@ public class AiShangApplication extends Application implements Constants {
 	public void saveVideo(Video video) {
 		try {
 			db.save(video);
+			Log.d("VideoPlayerActivity", "保存视频：" + video.getVid());
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
@@ -456,6 +458,7 @@ public class AiShangApplication extends Application implements Constants {
 	public void deleteVideo(int id) {
 		try {
 			db.delete(Video.class, WhereBuilder.b("vid", "=", id));
+			Log.d("VideoPlayerActivity", "删除视频：" + id);
 		} catch (DbException e) {
 			e.printStackTrace();
 		}

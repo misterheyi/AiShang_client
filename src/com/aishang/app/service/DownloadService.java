@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.aishang.app.AiShangApplication;
 import com.aishang.app.R;
@@ -38,10 +39,9 @@ public class DownloadService extends Service implements Constants {
 	public void onCreate() {
 		super.onCreate();
 		handler = new Handler();
-		downloadItems = new ArrayList<DownloadItem>();
 		currentDownloadItems = new HashMap<String, DownloadItem>();
 		application = (AiShangApplication) getApplication();
-		application.setDownLoadList(downloadItems);
+		downloadItems = new ArrayList<DownloadItem>();
 		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mBuilder = new NotificationCompat.Builder(this);
 	}
@@ -62,10 +62,20 @@ public class DownloadService extends Service implements Constants {
 		case START_DOWNLOAD:
 			// 开启下载服务
 			DownloadItem item = (DownloadItem) intent.getSerializableExtra(DOWNLOAD_INTENT);
-			item.setDownloadState(DOWNLOAD_STATE_WATTING);
-			downloadItems.add(item);
-			startDownload(item);
-			startTimerUpdateProgress();
+			boolean f = false;
+			for(DownloadItem downloadItem : downloadItems){
+				f = downloadItem.arg1 == item.arg1;
+				if(f){
+					break;
+				}
+			}
+			if(!f){
+				item.setDownloadState(DOWNLOAD_STATE_WATTING);
+				Log.d("VideoPlayerActivity", "添加到下载服务：" + item.arg1);
+				downloadItems.add(item);
+				startDownload(item);
+				startTimerUpdateProgress();
+			}
 			break;
 		case DOWNLOAD_STATE_PAUSE:
 			// 暂停下载
@@ -174,7 +184,7 @@ public class DownloadService extends Service implements Constants {
 			public void onStart() {
 				System.out.println("onStart");
 				mBuilder.setContentTitle("Download 文件").setContentText("Download in progress")
-						.setSmallIcon(R.drawable.ic_launcher);
+						.setSmallIcon(R.drawable.logo_index);
 			}
 
 			@Override
@@ -201,7 +211,7 @@ public class DownloadService extends Service implements Constants {
 				video.setType(item.arg2);
 
 				application.saveVideo(video);
-
+				
 				mBuilder.setContentText("Download complete").setProgress(0, 0, false);
 				mNotifyManager.cancel(0);
 

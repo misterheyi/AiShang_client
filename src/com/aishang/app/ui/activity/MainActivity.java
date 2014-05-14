@@ -12,21 +12,30 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.aishang.app.R;
 import com.aishang.app.common.Constants;
+import com.aishang.app.data.bean.AdPicture;
 import com.aishang.app.data.bean.AdVideo;
 import com.aishang.app.data.bean.Version;
+import com.aishang.app.data.dto.AdPictureDTO;
 import com.aishang.app.data.dto.AdVideoDTO;
 import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.aishang.app.service.DownloadService;
 import com.aishang.app.service.PlayADService;
 import com.aishang.app.ui.base.BaseActivity;
+import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.bitmap.BitmapCommonUtils;
+import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 
 public class MainActivity extends BaseActivity implements Constants {
 
@@ -35,7 +44,8 @@ public class MainActivity extends BaseActivity implements Constants {
 	private BroadcastReceiver autoUpdate;
 	private BroadcastReceiver receiver;
 	private BroadcastReceiver isUpdate;
-	
+	private BroadcastReceiver adUpdate;
+	private BitmapUtils bitmapUtil;
 	private Intent adIntent;
 
 	// private PlayADService adService;
@@ -51,6 +61,17 @@ public class MainActivity extends BaseActivity implements Constants {
 		setContentView(R.layout.activity_main);
 
 		initDir();
+		
+		bitmapUtil = new BitmapUtils(getApp());
+		BitmapDisplayConfig bigPicDisplayConfig = new BitmapDisplayConfig();
+		bigPicDisplayConfig.setShowOriginal(true); // 显示原始图片,不压缩, 尽量不要使用,
+													// 图片太大时容易OOM。
+		bigPicDisplayConfig.setBitmapConfig(Bitmap.Config.RGB_565);
+		bigPicDisplayConfig.setBitmapMaxSize(BitmapCommonUtils
+				.getScreenSize(getApplicationContext()));
+		bitmapUtil.configDefaultDisplayConfig(bigPicDisplayConfig);
+		bitmapUtil.configMemoryCacheEnabled(true);
+		bitmapUtil.configDiskCacheEnabled(true);
 
 		service = new Intent(getApplicationContext(), DownloadService.class);
 		startService(service);
@@ -68,10 +89,8 @@ public class MainActivity extends BaseActivity implements Constants {
 		registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 		isUpdate = new AskIsUpdate();
 		registerReceiver(isUpdate, new IntentFilter(ACTION_IS_UPDATE));
-
-		getApp().getAdVideoDTOList();
-		getApp().getAdPictureDTOList();
-
+		adUpdate = new AdUpdate();
+		registerReceiver(adUpdate, new IntentFilter(ACTION_ADPICTURE));
 	}
 
 	private void initDir() {
@@ -99,6 +118,8 @@ public class MainActivity extends BaseActivity implements Constants {
 	protected void onResume() {
 		// 重启服务
 		getApp().setPlayAD(true);
+		getApp().getAdVideoDTOList();
+		getApp().getAdPictureDTOList();
 		super.onResume();
 	};
 
@@ -140,6 +161,28 @@ public class MainActivity extends BaseActivity implements Constants {
 		}
 	}
 
+	class AdUpdate extends BroadcastReceiver{
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+				MainActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						AdPictureDTO adVideoDTO = getApp().getAdPictureDTO();
+						if(adVideoDTO.getAd4() != null && adVideoDTO.getStatus_code() != 500){
+							List<AdPicture> ad4 = adVideoDTO.getAd4();
+							for(int i= 0 ; i<ad4.size() ; i++){
+								TextView imageView = new TextView(MainActivity.this);
+								bitmapUtil.display(imageView, bce + ad4.get(i).getAdPicture_path());
+							}
+						}
+					}
+				});
+			
+		}
+		
+	}
+	
 	class Update extends BroadcastReceiver {
 
 		@Override
@@ -164,7 +207,6 @@ public class MainActivity extends BaseActivity implements Constants {
 						file.delete();
 					}
 					getApp().deleteVideo(video.getVid());
-					System.out.println("删除");
 				} else {
 					System.out.println("保留");
 				}
@@ -179,7 +221,7 @@ public class MainActivity extends BaseActivity implements Constants {
 					}
 				}
 				if (!f) {
-					System.out.println("下载");
+					Log.d("VideoPlayerActivity", "添加到下载服务：" + adVideo.getAdVideo_id());
 					DownloadItem downloadItem = new DownloadItem(DOWNLOAD_PATH_VIDEO);
 					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo_path());
 					downloadItem.arg1 = adVideo.getAdVideo_id();

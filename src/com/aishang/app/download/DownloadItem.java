@@ -17,7 +17,7 @@ public class DownloadItem implements Serializable {
 
 	public DownloadItem(String relativePATH) {
 		UUID uuid = UUID.randomUUID();
-		setUUID(uuid.toString());
+		setUUID(uuid.toString().replace("-", ""));
 		setFilePath(relativePATH + uuid);
 	}
 
