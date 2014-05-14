@@ -11,6 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.aishang.app.common.Constants;
 import com.aishang.app.common.PreferenceUtil;
@@ -445,8 +446,7 @@ public class AiShangApplication extends Application implements Constants {
 	public List<Video> getVideoByType(int type) {
 		List<Video> list = null;
 		try {
-			list = db.findAll(Selector.from(Video.class)
-					.where("type", "=", type).orderBy("id", true));
+			list = db.findAll(Selector.from(Video.class).where("type", "=", type).orderBy("id", true));
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
@@ -485,6 +485,7 @@ public class AiShangApplication extends Application implements Constants {
 	}
 
 	public void setPlaying(boolean isPlaying) {
+		Log.d("VideoPlayerActivity", "设置播放状态：" + isPlaying);
 		this.isPlaying = isPlaying;
 	}
 
@@ -501,6 +502,7 @@ public class AiShangApplication extends Application implements Constants {
 	}
 
 	public void setPlayAD(boolean isPlayAD) {
+		Log.d("VideoPlayerActivity", "设置是否播放：" + isPlayAD);
 		this.isPlayAD = isPlayAD;
 	}
 	
