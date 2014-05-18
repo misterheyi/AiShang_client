@@ -18,10 +18,10 @@ import com.aishang.app.common.PreferenceUtil;
 import com.aishang.app.data.bean.Cache;
 import com.aishang.app.data.bean.HairStyle;
 import com.aishang.app.data.bean.Version;
-import com.aishang.app.data.dto.AdPictureDTO;
 import com.aishang.app.data.dto.AdVideoDTO;
 import com.aishang.app.data.dto.HairStyleDTO;
 import com.aishang.app.data.dto.PriceListDTO;
+import com.aishang.app.data.dto.ScrollPictureDTO;
 import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.alibaba.fastjson.JSON;
@@ -35,13 +35,14 @@ import com.lidroid.xutils.http.RequestParams;
 import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
+import com.lidroid.xutils.util.LogUtils;
 
 public class AiShangApplication extends Application implements Constants {
 
 	private PriceListDTO mPriceListDTO;
 	private HairStyleDTO mHairStyleDTO;
 	private AdVideoDTO mAdVideoDTO;
-	private AdPictureDTO mAdPictureDTO;
+	private ScrollPictureDTO mAdPictureDTO;
 	private HttpUtils http;
 	private DbUtils db;
 	private PreferenceUtil mPreferenceUtil;
@@ -62,6 +63,8 @@ public class AiShangApplication extends Application implements Constants {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+        LogUtils.customTagPrefix = "xutils"; // 方便调试时过滤 adb logcat 输出
+        LogUtils.allowI = true; //关闭 LogUtils.i(...) 的 adb log 输出
 		http = new HttpUtils();
 		db = DbUtils.create(this, "aishang");
 		downLoadList = new ArrayList<DownloadItem>();
@@ -241,7 +244,7 @@ public class AiShangApplication extends Application implements Constants {
 	}
 
 	//获取待机广告图片
-	public AdPictureDTO getAdPictureDTOList() {
+	public ScrollPictureDTO getAdPictureDTOList() {
 		RequestParams params = new RequestParams();
 		params.addBodyParameter("hairstylistId",mPreferenceUtil.getString("hairstylist"));
 		params.addBodyParameter("storeId", mPreferenceUtil.getString("store"));
@@ -260,7 +263,7 @@ public class AiShangApplication extends Application implements Constants {
 							return;
 						}
 						saveCache(responseInfo.result, CACHE_ADPICTURE_TYPE);
-						mAdPictureDTO = JSON.parseObject(t, AdPictureDTO.class);
+						mAdPictureDTO = JSON.parseObject(t, ScrollPictureDTO.class);
 						Intent action = new Intent(ACTION_ADPICTURE);
 						AiShangApplication.this.sendBroadcast(action);
 					}
@@ -276,7 +279,7 @@ public class AiShangApplication extends Application implements Constants {
 							return;
 						}
 						mAdPictureDTO = JSON.parseObject(c.getCache(),
-								AdPictureDTO.class);
+								ScrollPictureDTO.class);
 						if (mAdPictureDTO.getStatus_code() != 500) {
 							Intent action = new Intent(ACTION_ADPICTURE);
 							AiShangApplication.this.sendBroadcast(action);
@@ -402,11 +405,11 @@ public class AiShangApplication extends Application implements Constants {
 		this.mHairStyleDTO = dto;
 	}
 
-	public AdPictureDTO getAdPictureDTO() {
+	public ScrollPictureDTO getAdPictureDTO() {
 		return mAdPictureDTO;
 	}
 
-	public void setAdPictureDTO(AdPictureDTO mAdPictureDTO) {
+	public void setAdPictureDTO(ScrollPictureDTO mAdPictureDTO) {
 		this.mAdPictureDTO = mAdPictureDTO;
 	}
 
@@ -448,7 +451,7 @@ public class AiShangApplication extends Application implements Constants {
 	public List<Video> getVideoByType(int type) {
 		List<Video> list = null;
 		try {
-			list = db.findAll(Selector.from(Video.class).where("type", "=", type).orderBy("id", true));
+			list = db.findAll(Selector.from(Video.class).where("type", "=", type).orderBy("groupId", false));
 		} catch (DbException e) {
 			e.printStackTrace();
 		}

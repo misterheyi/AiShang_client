@@ -209,6 +209,7 @@ public class DownloadService extends Service implements Constants {
 				video.setPath(item.getDownloadUrl());
 				video.setVid(item.arg1);
 				video.setType(item.arg2);
+				video.setGroupId(item.arg3);
 
 				application.saveVideo(video);
 				

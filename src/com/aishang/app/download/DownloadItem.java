@@ -11,7 +11,7 @@ public class DownloadItem implements Serializable {
 	private String filePath;
 	private String percentage = "0%";
 	private String uuid;
-	public int arg1, arg2;
+	public int arg1, arg2 , arg3;
 
 	private DownloadManager downLoadManager;
 

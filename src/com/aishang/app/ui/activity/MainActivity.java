@@ -18,16 +18,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aishang.app.R;
 import com.aishang.app.common.Constants;
-import com.aishang.app.data.bean.AdPicture;
-import com.aishang.app.data.bean.AdVideo;
+import com.aishang.app.data.bean.AdPictureVO;
+import com.aishang.app.data.bean.AdVideoVO;
 import com.aishang.app.data.bean.Version;
-import com.aishang.app.data.dto.AdPictureDTO;
 import com.aishang.app.data.dto.AdVideoDTO;
+import com.aishang.app.data.dto.ScrollPictureDTO;
 import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.aishang.app.service.DownloadService;
@@ -100,20 +99,6 @@ public class MainActivity extends BaseActivity implements Constants {
 		}
 	}
 
-	// ServiceConnection conn = new ServiceConnection() {
-	//
-	// @Override
-	// public void onServiceConnected(ComponentName name, IBinder service) {
-	// adService = ((PlayADService.LocalBinder) service).getService();
-	// }
-	//
-	// @Override
-	// public void onServiceDisconnected(ComponentName name) {
-	// // adService = null;
-	// }
-	//
-	// };
-
 	@Override
 	protected void onResume() {
 		// 重启服务
@@ -168,12 +153,12 @@ public class MainActivity extends BaseActivity implements Constants {
 				MainActivity.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						AdPictureDTO adVideoDTO = getApp().getAdPictureDTO();
-						if(adVideoDTO.getAd4() != null && adVideoDTO.getStatus_code() != 500){
-							List<AdPicture> ad4 = adVideoDTO.getAd4();
+						ScrollPictureDTO adVideoDTO = getApp().getAdPictureDTO();
+						if(adVideoDTO.getAd() != null && adVideoDTO.getStatus_code() != 500){
+							List<AdPictureVO> ad4 = adVideoDTO.getAd();
 							for(int i= 0 ; i<ad4.size() ; i++){
 								TextView imageView = new TextView(MainActivity.this);
-								bitmapUtil.display(imageView, bce + ad4.get(i).getAdPicture_path());
+								bitmapUtil.display(imageView, bce + ad4.get(i).getAdPicture().getAdPicture_path());
 							}
 						}
 					}
@@ -188,7 +173,7 @@ public class MainActivity extends BaseActivity implements Constants {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			AdVideoDTO adVideoDTO = getApp().getAdVideoDTO();
-			List<AdVideo> list = adVideoDTO.getVideos();
+			List<AdVideoVO> list = adVideoDTO.getVideos();
 			if (list == null)
 				return;
 			List<Video> videos = getApp().getVideos();
@@ -196,8 +181,8 @@ public class MainActivity extends BaseActivity implements Constants {
 				return;
 			for (Video video : videos) {
 				boolean f = false;
-				for (AdVideo ad : list) {
-					f = video.getVid() == ad.getAdVideo_id();
+				for (AdVideoVO ad : list) {
+					f = video.getVid() == ad.getAdVideo().getAdVideo_id();
 					if (f)
 						break;
 				}
@@ -212,20 +197,21 @@ public class MainActivity extends BaseActivity implements Constants {
 				}
 			}
 
-			for (AdVideo adVideo : list) {
+			for (AdVideoVO adVideo : list) {
 				boolean f = false;
 				for (Video video : videos) {
-					f = video.getVid() == adVideo.getAdVideo_id();
+					f = video.getVid() == adVideo.getAdVideo().getAdVideo_id();
 					if (f) {
 						break;
 					}
 				}
 				if (!f) {
-					Log.d("VideoPlayerActivity", "添加到下载服务：" + adVideo.getAdVideo_id());
+					Log.d("VideoPlayerActivity", "添加到下载服务：" + adVideo.getAdVideo().getAdVideo_id());
 					DownloadItem downloadItem = new DownloadItem(DOWNLOAD_PATH_VIDEO);
-					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo_path());
-					downloadItem.arg1 = adVideo.getAdVideo_id();
-					downloadItem.arg2 = adVideo.getAdVideo_type();
+					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo().getAdVideo_path());
+					downloadItem.arg1 = adVideo.getAdVideo().getAdVideo_id();
+					downloadItem.arg2 = adVideo.getAdVideo().getAdVideo_type();
+					downloadItem.arg3 = adVideo.getUser().getUserGroup_id();
 					Intent i = new Intent(getApplicationContext(), DownloadService.class);
 					i.putExtra(SERVICE_TYPE_NAME, START_DOWNLOAD);
 					i.putExtra(DOWNLOAD_INTENT, downloadItem);

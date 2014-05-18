@@ -17,7 +17,8 @@ import android.widget.VideoView;
 import com.aishang.app.R;
 import com.aishang.app.common.Constants;
 import com.aishang.app.data.bean.AdPicture;
-import com.aishang.app.data.dto.AdPictureDTO;
+import com.aishang.app.data.bean.AdPictureVO;
+import com.aishang.app.data.dto.ScrollPictureDTO;
 import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.aishang.app.service.DownloadService;
@@ -34,7 +35,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	private int type;
 
 	private List<Video> videos;
-	private List<AdPicture> pictures;
+	private List<AdPictureVO> pictures;
 
 	private int playPosition = 0;
 	private int picturePosition = 0;
@@ -47,7 +48,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	private Handler handler;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+ 		super.onCreate(savedInstanceState);
 		Log.d("VideoPlayerActivity", "onCreate");
 		setContentView(R.layout.activity_player);
 
@@ -70,9 +71,9 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 			return;
 		}
 
-		AdPictureDTO priceListDTO = getApp().getAdPictureDTOList();
+		ScrollPictureDTO priceListDTO = getApp().getAdPictureDTOList();
 		if (priceListDTO != null) {
-			pictures = priceListDTO.getAd4();
+			pictures = priceListDTO.getAd();
 
 		}
 
@@ -105,9 +106,9 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		System.out.println("playPicture" + pictures);
 		if (pictures == null || pictures.isEmpty()) {
 			replayVideo();
-			AdPictureDTO priceListDTO = getApp().getAdPictureDTOList();
+			ScrollPictureDTO priceListDTO = getApp().getAdPictureDTOList();
 			if (priceListDTO != null) {
-				pictures = getApp().getPriceListDTO().getAd4();
+				pictures = getApp().getAdPictureDTOList().getAd();
 			}
 			return;
 		}
@@ -115,7 +116,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		if (picturePosition >= pictures.size()) {
 			picturePosition = 0;
 		}
-		AdPicture adPicture = pictures.get(picturePosition);
+		AdPicture adPicture = pictures.get(picturePosition).getAdPicture();
 		getApp().playScrollPicture(adPicture.getAdPicture_id());
 		bitmapUtil.display(mImageView, bce + adPicture.getAdPicture_path());
 		now_play_stats = PICTURE;

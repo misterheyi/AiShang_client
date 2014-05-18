@@ -1,22 +1,21 @@
 package com.aishang.app.data.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.aishang.app.data.bean.AdVideo;
+import com.aishang.app.data.bean.AdVideoVO;
 
 public class AdVideoDTO extends DTOMain {
-	private List<AdVideo> videos;
+	
+	private List<AdVideoVO> videos;
 
-	public List<AdVideo> getVideos() {
-		if(videos == null){
-			return new ArrayList<AdVideo>();
-		}
+	public List<AdVideoVO> getVideos() {
 		return videos;
 	}
 
-	public void setVideos(List<AdVideo> videos) {
+	public void setVideos(List<AdVideoVO> videos) {
 		this.videos = videos;
 	}
+
+
 
 }

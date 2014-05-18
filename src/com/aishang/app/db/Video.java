@@ -11,6 +11,7 @@ public class Video {
 	private String path;
 	private int vid;
 	private int type;
+	private int groupId;
 
 	public int getType() {
 		return type;
@@ -52,4 +53,12 @@ public class Video {
 		this.vid = vid;
 	}
 
+	public int getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
+	}
+	
 }
