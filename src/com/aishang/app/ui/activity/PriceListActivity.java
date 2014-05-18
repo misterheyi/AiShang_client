@@ -73,7 +73,7 @@ public class PriceListActivity extends BaseActivity implements Constants {
 	@Override
 	protected void onDestroy() {
 		getApp().setPriceListDTO(null);
-yi 		this.finish();
+		this.finish();
 		super.onDestroy();
 	}
 
