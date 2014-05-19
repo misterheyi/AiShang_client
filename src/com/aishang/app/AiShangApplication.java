@@ -293,7 +293,7 @@ public class AiShangApplication extends Application implements Constants {
 	public void watchVideo(int vid) {
 
 		RequestParams params = new RequestParams();
-		params.addBodyParameter("id", vid + "");
+		params.addQueryStringParameter("id", vid+"");
 		http.send(HttpMethod.GET, playAd, params,
 				new RequestCallBack<String>() {
 					@Override
@@ -319,8 +319,8 @@ public class AiShangApplication extends Application implements Constants {
 	//添加待机图片播放次数
 	public void playScrollPicture(int id) {
 		RequestParams params = new RequestParams();
-		params.addBodyParameter("id", id + "");
-		http.send(HttpMethod.POST, playScrollPicture, params,
+		params.addQueryStringParameter("id", id + "");
+		http.send(HttpMethod.GET, playScrollPicture, params,
 				new RequestCallBack<String>() {
 					@Override
 					public void onLoading(long total, long current,

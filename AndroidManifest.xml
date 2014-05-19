@@ -30,7 +30,6 @@
             android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                  <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.HOME_FIRST" />
@@ -42,12 +41,14 @@
         <activity
             android:name="com.aishang.app.ui.activity.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:launchMode="singleInstance">
         </activity>
         <!-- 店内推荐 -->
         <activity
             android:name="com.aishang.app.ui.activity.PriceListActivity"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:launchMode="singleTask">
         </activity>
         <!-- 发型秀 -->
         <activity
@@ -57,7 +58,8 @@
         <!-- 发现详情页面 -->
         <activity
             android:name="com.aishang.app.ui.activity.HairInfoActivity"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="landscape"
+            android:launchMode="singleTask">
         </activity>
         <!-- 视频播放 -->
         <activity

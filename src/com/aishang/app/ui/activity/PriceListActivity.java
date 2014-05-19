@@ -2,7 +2,6 @@ package com.aishang.app.ui.activity;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.widget.Button;
 
 import com.aishang.app.R;
 import com.aishang.app.common.Constants;
-import com.aishang.app.data.dto.PriceListDTO;
 import com.aishang.app.ui.base.BaseActivity;
 import com.aishang.app.ui.fragment.PLADianeiChuxiao;
 import com.aishang.app.ui.fragment.PLAHairStylist;
