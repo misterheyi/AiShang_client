@@ -63,8 +63,8 @@ public class AiShangApplication extends Application implements Constants {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-        LogUtils.customTagPrefix = "xutils"; // 方便调试时过滤 adb logcat 输出
-        LogUtils.allowI = true; //关闭 LogUtils.i(...) 的 adb log 输出
+        LogUtils.customTagPrefix = "aishang"; // 方便调试时过滤 adb logcat 输出
+        LogUtils.allowD = true; //关闭 LogUtils.i(...) 的 adb log 输出
 		http = new HttpUtils();
 		db = DbUtils.create(this, "aishang");
 		downLoadList = new ArrayList<DownloadItem>();

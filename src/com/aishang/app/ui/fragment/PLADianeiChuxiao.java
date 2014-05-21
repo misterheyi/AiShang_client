@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,8 @@ import com.aishang.app.data.bean.AdPicture;
 import com.aishang.app.data.dto.PriceListDTO;
 import com.aishang.app.ui.base.BaseFragment;
 import com.lidroid.xutils.BitmapUtils;
+import com.lidroid.xutils.bitmap.BitmapCommonUtils;
+import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 
 public class PLADianeiChuxiao extends BaseFragment {
 	private View loading;
@@ -24,7 +27,7 @@ public class PLADianeiChuxiao extends BaseFragment {
 	private BroadcastReceiver update;
 	private LinearLayout layout;
 	public static BitmapUtils bitmapUtils;
-	
+	private BitmapDisplayConfig bigPicDisplayConfig;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_list_h, null);
@@ -42,6 +45,10 @@ public class PLADianeiChuxiao extends BaseFragment {
 			}
 		}*/
 		bitmapUtils = BitmapHelp.getBitmapUtils(this.getApp());
+        bigPicDisplayConfig = new BitmapDisplayConfig();
+        //bigPicDisplayConfig.setShowOriginal(true); // 显示原始图片,不压缩, 尽量不要使用, 图片太大时容易OOM。
+        bigPicDisplayConfig.setBitmapConfig(Bitmap.Config.RGB_565);
+        bigPicDisplayConfig.setBitmapMaxSize(BitmapCommonUtils.getScreenSize(this.getActivity().getApplicationContext()));
 		display();
 		IntentFilter filter = new IntentFilter(ACTION_PRICELIST);
 		update = new Update();

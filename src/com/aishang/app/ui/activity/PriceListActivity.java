@@ -2,7 +2,6 @@ package com.aishang.app.ui.activity;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -15,14 +14,10 @@ import com.aishang.app.ui.fragment.PLADianeiChuxiao;
 import com.aishang.app.ui.fragment.PLAHairStylist;
 import com.aishang.app.ui.fragment.PLAJiamuBiao;
 import com.aishang.app.ui.fragment.PLATeseShangpin;
-import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.bitmap.BitmapCommonUtils;
-import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 
 public class PriceListActivity extends BaseActivity implements Constants {
 
 	private Button b1, b2, b3, b4;
-	BitmapUtils bitmapUtil;
 	private Fragment mPLADianeiChuxiao;
 	private Fragment mPLATeseShangpin;
 	private Fragment mPLAJiamuBiao;
@@ -38,21 +33,11 @@ public class PriceListActivity extends BaseActivity implements Constants {
 		b2 = (Button) findViewById(R.id.b2);
 		b3 = (Button) findViewById(R.id.b3);
 		b4 = (Button) findViewById(R.id.b4);
-		bitmapUtil = new BitmapUtils(getApp());
 		mContent = new Fragment();
 		mPLADianeiChuxiao = new PLADianeiChuxiao();
 		mPLATeseShangpin = new PLATeseShangpin();
 		mPLAJiamuBiao = new PLAJiamuBiao();
 		mPLAHairStylist = new PLAHairStylist();
-		BitmapDisplayConfig bigPicDisplayConfig = new BitmapDisplayConfig();
-		bigPicDisplayConfig.setShowOriginal(true); // 显示原始图片,不压缩, 尽量不要使用,
-													// 图片太大时容易OOM。
-		bigPicDisplayConfig.setBitmapConfig(Bitmap.Config.RGB_565);
-		bigPicDisplayConfig.setBitmapMaxSize(BitmapCommonUtils
-				.getScreenSize(getApplicationContext()));
-		bitmapUtil.configDefaultDisplayConfig(bigPicDisplayConfig);
-		bitmapUtil.configMemoryCacheEnabled(true);
-		bitmapUtil.configDiskCacheEnabled(true);
 		swipeFragment(mPLADianeiChuxiao);
 	}
 

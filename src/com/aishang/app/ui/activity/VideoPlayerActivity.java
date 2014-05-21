@@ -11,7 +11,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.aishang.app.R;
@@ -28,7 +28,7 @@ import com.lidroid.xutils.BitmapUtils;
 public class VideoPlayerActivity extends BaseActivity implements Constants, OnCompletionListener {
 
 	private VideoView mVideoView;
-	private ImageView mImageView;
+	private TextView mImageView;
 
 	private int status;
 	private boolean isClick;
@@ -57,7 +57,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		status = getIntent().getIntExtra("status", 0);
 		type = getIntent().getIntExtra("type", 0);
 		mVideoView = (VideoView) findViewById(R.id.videoView);
-		mImageView = (ImageView) findViewById(R.id.adView);
+		mImageView = (TextView) findViewById(R.id.adView);
 		
 		bitmapUtil= new BitmapUtils(getApplicationContext());
 		mVideoView.setOnCompletionListener(this);
