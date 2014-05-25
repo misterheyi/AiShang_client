@@ -53,7 +53,8 @@
         <!-- 发型秀 -->
         <activity
             android:name="com.aishang.app.ui.activity.HairShowActivity"
-            android:screenOrientation="landscape" >
+            android:screenOrientation="landscape" 
+            android:launchMode="singleTask">
         </activity>
         <!-- 发现详情页面 -->
         <activity

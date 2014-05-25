@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.VideoView;
@@ -50,14 +51,14 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	protected void onCreate(Bundle savedInstanceState) {
  		super.onCreate(savedInstanceState);
 		Log.d("VideoPlayerActivity", "onCreate");
-		setContentView(R.layout.activity_player);
-
+		
+		View v = LayoutInflater.from(this).inflate(R.layout.activity_player, null);
 		getApp().setPlaying(true);
 		isClick = getIntent().getBooleanExtra("isClick", false);
 		status = getIntent().getIntExtra("status", 0);
 		type = getIntent().getIntExtra("type", 0);
-		mVideoView = (VideoView) findViewById(R.id.videoView);
-		mImageView = (TextView) findViewById(R.id.adView);
+		mVideoView = (VideoView) v.findViewById(R.id.videoView);
+		mImageView = (TextView) v.findViewById(R.id.adView);
 		
 		bitmapUtil= new BitmapUtils(getApplicationContext());
 		mVideoView.setOnCompletionListener(this);
@@ -67,10 +68,12 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		if (videos.size() == 0) {
 			if (isClick) {
 				startAction();
+			}else{
+				finish();
 			}
 			return;
 		}
-
+		setContentView(v);
 		ScrollPictureDTO priceListDTO = getApp().getAdPictureDTOList();
 		if (priceListDTO != null) {
 			pictures = priceListDTO.getAd();
@@ -86,13 +89,15 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	public void play() {
 		File file = new File(videos.get(playPosition).getFilePath());
 		if (!file.exists()) {
+			Log.d("VideoPlayerActivity", "视频没下载完");
 			if (isClick) {
 				startAction();
 			} else {
 				finish();
-				//startDownload(videos.get(playPosition));
+//				startDownload(videos.get(playPosition));
 			}
 		} else {
+			Log.d("VideoPlayerActivity", "播放视频："+videos.get(playPosition).getFilePath());
 			mVideoView.setVideoPath(videos.get(playPosition).getFilePath());
 			mVideoView.start();
 			getApp().watchVideo(videos.get(playPosition).getVid());
@@ -103,7 +108,6 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	}
 
 	public void playPicture() {
-		System.out.println("playPicture" + pictures);
 		if (pictures == null || pictures.isEmpty()) {
 			replayVideo();
 			ScrollPictureDTO priceListDTO = getApp().getAdPictureDTOList();
@@ -139,6 +143,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		downloadItem.setDownloadUrl(adVideo.getPath());
 		downloadItem.arg1 = adVideo.getVid();
 		downloadItem.arg2 = adVideo.getType();
+		downloadItem.arg3 = adVideo.getGroupId();
 		Intent i = new Intent(getApplicationContext(), DownloadService.class);
 		i.putExtra(SERVICE_TYPE_NAME, START_DOWNLOAD);
 		i.putExtra(DOWNLOAD_INTENT, downloadItem);

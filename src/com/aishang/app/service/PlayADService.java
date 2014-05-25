@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.aishang.app.AiShangApplication;
 import com.aishang.app.common.Constants;
@@ -19,6 +20,7 @@ public class PlayADService extends Service implements Constants {
 
 	public Handler handler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
+			Log.d("LoginActivity", "启动播放页面");
 			Intent intent4 = new Intent(PlayADService.this, VideoPlayerActivity.class);
 			intent4.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			intent4.putExtra("type", 0);
@@ -67,7 +69,7 @@ public class PlayADService extends Service implements Constants {
 				System.out.println("无操作时间到 播放视频");
 				application.setAd_time(0);
 				if (!application.isPlaying() && application.isPlayAD()) {
-					if (application.getVideos().size() > 0)
+					if (application.getVideoByType(0).size() > 0)
 						handler.sendEmptyMessage(1);
 				}
 			}

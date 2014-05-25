@@ -52,7 +52,7 @@
                 android:id="@+id/b1"
                 android:layout_width="180dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/btn_black"
+                android:background="@null"
                 android:onClick="swipe"
                 android:text="店内促销"
                 android:textColor="#fff"

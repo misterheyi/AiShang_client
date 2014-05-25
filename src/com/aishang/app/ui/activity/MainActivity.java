@@ -72,6 +72,12 @@ public class MainActivity extends BaseActivity implements Constants {
 		bitmapUtil.configMemoryCacheEnabled(true);
 		bitmapUtil.configDiskCacheEnabled(true);
 
+
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
 		service = new Intent(getApplicationContext(), DownloadService.class);
 		startService(service);
 
@@ -206,7 +212,6 @@ public class MainActivity extends BaseActivity implements Constants {
 					}
 				}
 				if (!f) {
-					Log.d("VideoPlayerActivity", "添加到下载服务：" + adVideo.getAdVideo().getAdVideo_id());
 					DownloadItem downloadItem = new DownloadItem(DOWNLOAD_PATH_VIDEO);
 					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo().getAdVideo_path());
 					downloadItem.arg1 = adVideo.getAdVideo().getAdVideo_id();
