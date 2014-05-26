@@ -449,13 +449,13 @@ public class AiShangApplication extends Application implements Constants {
 	}
 
 	public List<Video> getVideoByType(int type) {
-		List<Video> list = null;
+		List<Video> list = new ArrayList<Video>();
 		try {
 			list = db.findAll(Selector.from(Video.class).where("type", "=", type).orderBy("groupId", false));
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
-		return list;
+		return list==null?new ArrayList<Video>():list;
 	}
 
 	public void deleteVideo(int id) {
