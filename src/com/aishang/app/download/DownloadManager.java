@@ -2,21 +2,22 @@ package com.aishang.app.download;
 
 import java.io.File;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+import net.tsz.afinal.http.HttpHandler;
+
 import com.aishang.app.common.Constants;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.http.HttpHandler;
-import com.lidroid.xutils.http.callback.RequestCallBack;
 
 public class DownloadManager implements Constants {
 
 	private boolean isStop;
 	private HttpHandler<File> mHttpHandler;
 
-	public DownloadManager startDownload(String url, String toPath, RequestCallBack<File> downCallBack) {
+	public DownloadManager startDownload(String url, String toPath, AjaxCallBack<File> downCallBack) {
 		if (downCallBack == null) {
 			throw new RuntimeException("RequestCallBack对象不能为null");
 		} else {
-			HttpUtils down = new HttpUtils();
+			FinalHttp down = new FinalHttp();
 			mHttpHandler = down.download(url, toPath, false, downCallBack);
 		}
 
@@ -27,7 +28,7 @@ public class DownloadManager implements Constants {
 		if (mHttpHandler != null) {
 			mHttpHandler.stop();
 			mHttpHandler.cancel(true);
-			if (!mHttpHandler.isStopped()) {
+			if (!mHttpHandler.isStop()) {
 				mHttpHandler.stop();
 				mHttpHandler.cancel(true);
 			}
@@ -35,7 +36,7 @@ public class DownloadManager implements Constants {
 	}
 
 	public boolean isStop() {
-		isStop = mHttpHandler.isStopped();
+		isStop = mHttpHandler.isStop();
 		return isStop;
 	}
 

@@ -1,5 +1,8 @@
 package com.aishang.app.ui.activity;
 
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
+import net.tsz.afinal.http.AjaxParams;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,12 +22,6 @@ import com.aishang.app.common.PreferenceUtil;
 import com.aishang.app.data.dto.LoginDTO;
 import com.aishang.app.ui.base.BaseActivity;
 import com.alibaba.fastjson.JSON;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
 
 public class LoginActivity extends BaseActivity implements Constants {
 
@@ -87,25 +84,19 @@ public class LoginActivity extends BaseActivity implements Constants {
 		String email = emailEditText.getEditableText().toString();
 		String pwd = pwdEditText.getEditableText().toString();
 		dialog.show();
-		HttpUtils http = new HttpUtils();
-		RequestParams params = new RequestParams();
-		params.addBodyParameter("email", email);
-		params.addBodyParameter("pwd", pwd);
-		params.addBodyParameter("imei", imei);
-		http.send(HttpMethod.POST, login, params,
-				new RequestCallBack<String>() {
+		FinalHttp http = new FinalHttp();
+		AjaxParams params = new AjaxParams();
+		params.put("email", email);
+		params.put("pwd", pwd);
+		params.put("imei", imei);
+		http.post(login, params,
+				new AjaxCallBack<String>() {
 					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
-					}
-
-					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						String t = responseInfo.result;
-						System.out.println(t);
-						if (TextUtils.isEmpty(t))
+					public void onSuccess(String responseStr) {
+						System.out.println(responseStr);
+						if (TextUtils.isEmpty(responseStr))
 							return;
-						LoginDTO dto = JSON.parseObject(t, LoginDTO.class);
+						LoginDTO dto = JSON.parseObject(responseStr, LoginDTO.class);
 						if (dto.getStatus_code() == 500) {
 							dialog.cancel();
 							return;
@@ -124,8 +115,9 @@ public class LoginActivity extends BaseActivity implements Constants {
 					}
 
 					@Override
-					public void onFailure(HttpException error, String msg) {
-						System.out.println(msg);
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
+						System.out.println(strMsg);
 						dialog.cancel();
 					}
 				});

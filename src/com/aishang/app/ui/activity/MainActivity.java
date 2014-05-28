@@ -3,6 +3,7 @@ package com.aishang.app.ui.activity;
 import java.io.File;
 import java.util.List;
 
+import net.tsz.afinal.FinalBitmap;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -12,11 +13,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -32,9 +31,6 @@ import com.aishang.app.download.DownloadItem;
 import com.aishang.app.service.DownloadService;
 import com.aishang.app.service.PlayADService;
 import com.aishang.app.ui.base.BaseActivity;
-import com.lidroid.xutils.BitmapUtils;
-import com.lidroid.xutils.bitmap.BitmapCommonUtils;
-import com.lidroid.xutils.bitmap.BitmapDisplayConfig;
 
 public class MainActivity extends BaseActivity implements Constants {
 
@@ -44,7 +40,7 @@ public class MainActivity extends BaseActivity implements Constants {
 	private BroadcastReceiver receiver;
 	private BroadcastReceiver isUpdate;
 	private BroadcastReceiver adUpdate;
-	private BitmapUtils bitmapUtil;
+	private FinalBitmap fb;
 	private Intent adIntent;
 
 	// private PlayADService adService;
@@ -58,21 +54,8 @@ public class MainActivity extends BaseActivity implements Constants {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
+		fb = FinalBitmap.create(getApp());//初始化FinalBitmap模块
 		initDir();
-		
-		bitmapUtil = new BitmapUtils(getApp());
-		BitmapDisplayConfig bigPicDisplayConfig = new BitmapDisplayConfig();
-		bigPicDisplayConfig.setShowOriginal(true); // 显示原始图片,不压缩, 尽量不要使用,
-													// 图片太大时容易OOM。
-		bigPicDisplayConfig.setBitmapConfig(Bitmap.Config.RGB_565);
-		bigPicDisplayConfig.setBitmapMaxSize(BitmapCommonUtils
-				.getScreenSize(getApplicationContext()));
-		bitmapUtil.configDefaultDisplayConfig(bigPicDisplayConfig);
-		bitmapUtil.configMemoryCacheEnabled(true);
-		bitmapUtil.configDiskCacheEnabled(true);
-
-
 	}
 
 	@Override
@@ -156,19 +139,19 @@ public class MainActivity extends BaseActivity implements Constants {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-				MainActivity.this.runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						ScrollPictureDTO adVideoDTO = getApp().getAdPictureDTO();
-						if(adVideoDTO.getAd() != null && adVideoDTO.getStatus_code() != 500){
-							List<AdPictureVO> ad4 = adVideoDTO.getAd();
-							for(int i= 0 ; i<ad4.size() ; i++){
-								TextView imageView = new TextView(MainActivity.this);
-								bitmapUtil.display(imageView, bce + ad4.get(i).getAdPicture().getAdPicture_path());
-							}
-						}
-					}
-				});
+//				MainActivity.this.runOnUiThread(new Runnable() {
+//					@Override
+//					public void run() {
+//						ScrollPictureDTO adVideoDTO = getApp().getAdPictureDTO();
+//						if(adVideoDTO.getAd() != null && adVideoDTO.getStatus_code() != 500){
+//							List<AdPictureVO> ad4 = adVideoDTO.getAd();
+//							for(int i= 0 ; i<ad4.size() ; i++){
+//								TextView imageView = new TextView(MainActivity.this);
+//								fb.display(imageView, bce + ad4.get(i).getAdPicture().getAdPicture_path());
+//							}
+//						}
+//					}
+//				});
 			
 		}
 		

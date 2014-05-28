@@ -2,6 +2,7 @@ package com.aishang.app.ui.activity;
 
 import java.util.List;
 
+import net.tsz.afinal.FinalBitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,15 +17,13 @@ import com.aishang.app.R;
 import com.aishang.app.common.Constants;
 import com.aishang.app.data.bean.HairStyle;
 import com.aishang.app.ui.base.BaseActivity;
-import com.lidroid.xutils.BitmapUtils;
 
 public class HairInfoActivity extends BaseActivity implements Constants, OnItemClickListener {
 	private ListView mListView;
 	private ImageView mImageView;
 	private List<HairStyle> hairStyles;
 	private HairStyle show;
-	private BitmapUtils bitmapUtil;
-
+	private FinalBitmap fb;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -33,8 +32,8 @@ public class HairInfoActivity extends BaseActivity implements Constants, OnItemC
 		mImageView = (ImageView) findViewById(R.id.show);
 		hairStyles = getApp().getHairInfo();
 		show = getApp().getShow();
-		bitmapUtil = new BitmapUtils(this.getApplicationContext());
-		bitmapUtil.display(mImageView, bce + show.getHairStyle_path());
+		fb = FinalBitmap.create(getApp());//初始化FinalBitmap模块
+		fb.display(mImageView, bce + show.getHairStyle_path());
 		mListView.setAdapter(new MyHairListAdapter());
 		mListView.setOnItemClickListener(this);
 	}
@@ -62,7 +61,7 @@ public class HairInfoActivity extends BaseActivity implements Constants, OnItemC
 				convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item_hairinfo, null);
 			}
 			ImageView imageView = (ImageView) convertView.findViewById(R.id.img);
-			bitmapUtil.display(imageView, bce + hairStyles.get(position).getHairStyle_path());
+			fb.display(imageView, bce + hairStyles.get(position).getHairStyle_path());
 			return convertView;
 		}
 
@@ -70,7 +69,7 @@ public class HairInfoActivity extends BaseActivity implements Constants, OnItemC
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		bitmapUtil.display(mImageView, bce + hairStyles.get(position).getHairStyle_path());
+		fb.display(mImageView, bce + hairStyles.get(position).getHairStyle_path());
 	}
 
 }

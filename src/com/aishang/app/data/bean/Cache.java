@@ -1,7 +1,8 @@
 package com.aishang.app.data.bean;
 
-import com.lidroid.xutils.db.annotation.Id;
-import com.lidroid.xutils.db.annotation.Table;
+import net.tsz.afinal.annotation.sqlite.Id;
+import net.tsz.afinal.annotation.sqlite.Table;
+
 
 
 @Table(name = "cache")

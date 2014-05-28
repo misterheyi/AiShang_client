@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import net.tsz.afinal.FinalDb;
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.exception.DbException;
+import net.tsz.afinal.http.AjaxCallBack;
+import net.tsz.afinal.http.AjaxParams;
 import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -25,17 +30,6 @@ import com.aishang.app.data.dto.ScrollPictureDTO;
 import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.alibaba.fastjson.JSON;
-import com.lidroid.xutils.DbUtils;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.db.sqlite.Selector;
-import com.lidroid.xutils.db.sqlite.WhereBuilder;
-import com.lidroid.xutils.exception.DbException;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
-import com.lidroid.xutils.http.client.HttpRequest.HttpMethod;
-import com.lidroid.xutils.util.LogUtils;
 
 public class AiShangApplication extends Application implements Constants {
 
@@ -43,14 +37,13 @@ public class AiShangApplication extends Application implements Constants {
 	private HairStyleDTO mHairStyleDTO;
 	private AdVideoDTO mAdVideoDTO;
 	private ScrollPictureDTO mAdPictureDTO;
-	private HttpUtils http;
-	private DbUtils db;
+	private FinalDb db = null;
 	private PreferenceUtil mPreferenceUtil;
 
 	private List<DownloadItem> downLoadList;
 	private List<HairStyle> hairInfo;
 	private HairStyle show;
-
+	private FinalHttp http = new FinalHttp();
 	private int ad_time;
 	private boolean isPlaying;
 	private boolean isPlayAD;
@@ -63,10 +56,7 @@ public class AiShangApplication extends Application implements Constants {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-        LogUtils.customTagPrefix = "aishang"; // 方便调试时过滤 adb logcat 输出
-        LogUtils.allowD = true; //关闭 LogUtils.i(...) 的 adb log 输出
-		http = new HttpUtils();
-		db = DbUtils.create(this, "aishang");
+		db = FinalDb.create(this);
 		downLoadList = new ArrayList<DownloadItem>();
 		mPreferenceUtil = new PreferenceUtil(getApplicationContext());
 	}
@@ -74,37 +64,15 @@ public class AiShangApplication extends Application implements Constants {
 	//获取店内推荐数据
 	public PriceListDTO getPriceListDTO() {
 		if (mPriceListDTO == null || mPriceListDTO.getStatus_code() == 500) {
-			RequestParams params = new RequestParams();
-			params.addBodyParameter("hairstylistId",mPreferenceUtil.getString("hairstylist"));
-			params.addBodyParameter("storeId",mPreferenceUtil.getString("store"));
-			params.addBodyParameter("agentId",mPreferenceUtil.getString("agent"));
-			http.send(HttpMethod.POST, priceList, params,
-					new RequestCallBack<String>() {
+			AjaxParams params = new AjaxParams();
+			params.put("hairstylistId",mPreferenceUtil.getString("hairstylist"));
+			params.put("storeId",mPreferenceUtil.getString("store"));
+			params.put("agentId",mPreferenceUtil.getString("agent"));
+			http.post(priceList, params,
+					new AjaxCallBack<String>() {
 						@Override
-						public void onLoading(long total, long current,
-								boolean isUploading) {
-						}
-
-						@Override
-						public void onSuccess(ResponseInfo<String> responseInfo) {
-							String responseStr = responseInfo.result;
-							if (TextUtils.isEmpty(responseStr)) {
-								return;
-							}
-							mPriceListDTO = JSON.parseObject(responseStr, PriceListDTO.class);
-							if (mPriceListDTO.getStatus_code() != 500) {
-								saveCache(responseInfo.result,CACHE_PRICELIST_TYPE);
-								Intent action = new Intent(ACTION_PRICELIST);
-								AiShangApplication.this.sendBroadcast(action);
-							}
-						}
-
-						@Override
-						public void onStart() {
-						}
-
-						@Override
-						public void onFailure(HttpException error, String msg) {
+						public void onFailure(Throwable t, int errorNo,
+								String strMsg) {
 							Cache c = getCache(CACHE_PRICELIST_TYPE);
 							if (c == null) {
 								return;
@@ -116,6 +84,19 @@ public class AiShangApplication extends Application implements Constants {
 								AiShangApplication.this.sendBroadcast(action);
 							}
 						}
+
+						@Override
+						public void onSuccess(String responseStr) {
+							if (TextUtils.isEmpty(responseStr)) {
+								return;
+							}
+							mPriceListDTO = JSON.parseObject(responseStr, PriceListDTO.class);
+							if (mPriceListDTO.getStatus_code() != 500) {
+								saveCache(responseStr,CACHE_PRICELIST_TYPE);
+								Intent action = new Intent(ACTION_PRICELIST);
+								AiShangApplication.this.sendBroadcast(action);
+							}
+						}
 					});
 		}
 		return mPriceListDTO;
@@ -123,22 +104,17 @@ public class AiShangApplication extends Application implements Constants {
 	
 	//获取最新版本
 	public void checkUpdate() {
-		http.send(HttpMethod.GET, chechUpdate + "?version=1",
-				new RequestCallBack<String>() {
-					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
-					}
+		http.get(chechUpdate + "?version=1",
+				new AjaxCallBack<String>() {
 
 					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						String t = responseInfo.result;
-						if (TextUtils.isEmpty(t)|| t.toLowerCase(Locale.CHINA).equals("null")) {
+					public void onSuccess(String responseStr) {
+						if (TextUtils.isEmpty(responseStr)|| responseStr.toLowerCase(Locale.CHINA).equals("null")) {
 							return;
 						}
 						Version version = null;
 						try {
-							version = JSON.parseObject(t, Version.class);
+							version = JSON.parseObject(responseStr, Version.class);
 							if (TextUtils.isEmpty(version.getPath())) {
 								return;
 							}
@@ -151,42 +127,34 @@ public class AiShangApplication extends Application implements Constants {
 					}
 
 					@Override
-					public void onStart() {
-					}
-
-					@Override
-					public void onFailure(HttpException error, String msg) {
-						System.out.println("checkUpdate: " + msg);
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
+						System.out.println("checkUpdate: " + strMsg);
 					}
 				});
 	}
 
 	//获取发行库数据
 	public void getHairStyleDTO(String[] tag, final String page) {
-		RequestParams params = new RequestParams();
-		params.addBodyParameter("sex", tag[0]);
-		params.addBodyParameter("area", tag[1]);
-		params.addBodyParameter("desc", tag[2]);
-		params.addBodyParameter("height", tag[3]);
-		params.addBodyParameter("page", page);
-		params.addBodyParameter("hairstylistId",mPreferenceUtil.getString("hairstylist"));
-		params.addBodyParameter("storeId", mPreferenceUtil.getString("store"));
-		http.send(HttpMethod.POST, hairStyle, params,
-				new RequestCallBack<String>() {
-					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
-					}
+		AjaxParams params = new AjaxParams();
+		params.put("sex", tag[0]);
+		params.put("area", tag[1]);
+		params.put("desc", tag[2]);
+		params.put("height", tag[3]);
+		params.put("page", page);
+		params.put("hairstylistId",mPreferenceUtil.getString("hairstylist"));
+		params.put("storeId", mPreferenceUtil.getString("store"));
+		http.post(hairStyle, params,
+				new AjaxCallBack<String>() {
 
 					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						String t = responseInfo.result;
-						if (TextUtils.isEmpty(t)) {
+					public void onSuccess(String responseStr) {
+						if (TextUtils.isEmpty(responseStr)) {
 							return;
 						}
-						mHairStyleDTO = JSON.parseObject(t, HairStyleDTO.class);
+						mHairStyleDTO = JSON.parseObject(responseStr, HairStyleDTO.class);
 						if (page.equals("1")) {
-							saveCache(t, CACHE_HAIRSTYLE_TYPE);
+							saveCache(responseStr, CACHE_HAIRSTYLE_TYPE);
 						}
 						Intent action = new Intent(ACTION_HAIRSTYLE);
 						AiShangApplication.this.sendBroadcast(action);
@@ -197,7 +165,8 @@ public class AiShangApplication extends Application implements Constants {
 					}
 
 					@Override
-					public void onFailure(HttpException error, String msg) {
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
 						Cache c = getCache(CACHE_HAIRSTYLE_TYPE);
 						if (c != null) {
 							mHairStyleDTO = JSON.parseObject(c.getCache(),
@@ -211,24 +180,18 @@ public class AiShangApplication extends Application implements Constants {
 
 	//获取视频数据
 	public void getAdVideoDTOList() {
-		RequestParams params = new RequestParams();
-		params.addBodyParameter("hairstylistId",mPreferenceUtil.getString("hairstylist"));
-		params.addBodyParameter("storeId", mPreferenceUtil.getString("store"));
-		params.addBodyParameter("agentId", mPreferenceUtil.getString("agent"));
-		http.send(HttpMethod.POST, adVideo, params,
-				new RequestCallBack<String>() {
+		AjaxParams params = new AjaxParams();
+		params.put("hairstylistId",mPreferenceUtil.getString("hairstylist"));
+		params.put("storeId", mPreferenceUtil.getString("store"));
+		params.put("agentId", mPreferenceUtil.getString("agent"));
+		http.post(adVideo, params,
+				new AjaxCallBack<String>() {
 					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
-					}
-
-					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						String t = responseInfo.result;
-						if (TextUtils.isEmpty(t)) {
+					public void onSuccess(String responseStr) {
+						if (TextUtils.isEmpty(responseStr)) {
 							return;
 						}
-						mAdVideoDTO = JSON.parseObject(t, AdVideoDTO.class);
+						mAdVideoDTO = JSON.parseObject(responseStr, AdVideoDTO.class);
 						Intent action = new Intent(ACTION_ADVIDEO);
 						AiShangApplication.this.sendBroadcast(action);
 					}
@@ -238,42 +201,35 @@ public class AiShangApplication extends Application implements Constants {
 					}
 
 					@Override
-					public void onFailure(HttpException error, String msg) {
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
 					}
 				});
 	}
 
 	//获取待机广告图片
 	public ScrollPictureDTO getAdPictureDTOList() {
-		RequestParams params = new RequestParams();
-		params.addBodyParameter("hairstylistId",mPreferenceUtil.getString("hairstylist"));
-		params.addBodyParameter("storeId", mPreferenceUtil.getString("store"));
-		params.addBodyParameter("agentId", mPreferenceUtil.getString("agent"));
-		http.send(HttpMethod.POST, scrollPicture, params,
-				new RequestCallBack<String>() {
-					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
-					}
+		AjaxParams params = new AjaxParams();
+		params.put("hairstylistId",mPreferenceUtil.getString("hairstylist"));
+		params.put("storeId", mPreferenceUtil.getString("store"));
+		params.put("agentId", mPreferenceUtil.getString("agent"));
+		http.post(scrollPicture, params,
+				new AjaxCallBack<String>() {
 
 					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						String t = responseInfo.result;
-						if (TextUtils.isEmpty(t)) {
+					public void onSuccess(String responseStr) {
+						if (TextUtils.isEmpty(responseStr)) {
 							return;
 						}
-						saveCache(responseInfo.result, CACHE_ADPICTURE_TYPE);
-						mAdPictureDTO = JSON.parseObject(t, ScrollPictureDTO.class);
+						saveCache(responseStr, CACHE_ADPICTURE_TYPE);
+						mAdPictureDTO = JSON.parseObject(responseStr, ScrollPictureDTO.class);
 						Intent action = new Intent(ACTION_ADPICTURE);
 						AiShangApplication.this.sendBroadcast(action);
 					}
 
 					@Override
-					public void onStart() {
-					}
-
-					@Override
-					public void onFailure(HttpException error, String msg) {
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
 						Cache c = getCache(CACHE_ADPICTURE_TYPE);
 						if (c == null) {
 							return;
@@ -291,53 +247,36 @@ public class AiShangApplication extends Application implements Constants {
 
 	//添加待机视频播放次数
 	public void watchVideo(int vid) {
-
-		RequestParams params = new RequestParams();
-		params.addQueryStringParameter("id", vid+"");
-		http.send(HttpMethod.GET, playAd, params,
-				new RequestCallBack<String>() {
+		AjaxParams params = new AjaxParams();
+		params.put("id", vid+"");
+		http.get(playAd, params,
+				new AjaxCallBack<String>() {
 					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
+					public void onSuccess(String responseStr) {
+						System.out.println("添加播放次数成功");
 					}
-
 					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						System.out.println(responseInfo.result);
-					}
-
-					@Override
-					public void onStart() {
-					}
-
-					@Override
-					public void onFailure(HttpException error, String msg) {
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
+						System.out.println("添加播放次数失败");
 					}
 				});
 	}
 
 	//添加待机图片播放次数
 	public void playScrollPicture(int id) {
-		RequestParams params = new RequestParams();
-		params.addQueryStringParameter("id", id + "");
-		http.send(HttpMethod.GET, playScrollPicture, params,
-				new RequestCallBack<String>() {
+		AjaxParams params = new AjaxParams();
+		params.put("id", id + "");
+		http.get(playScrollPicture, params,
+				new AjaxCallBack<String>() {
 					@Override
-					public void onLoading(long total, long current,
-							boolean isUploading) {
+					public void onSuccess(String responseStr) {
+						System.out.println("添加图片播放次数成功");
 					}
-
 					@Override
-					public void onSuccess(ResponseInfo<String> responseInfo) {
-						System.out.println(responseInfo.result);
-					}
-
-					@Override
-					public void onStart() {
-					}
-
-					@Override
-					public void onFailure(HttpException error, String msg) {
+					public void onFailure(Throwable t, int errorNo,
+							String strMsg) {
+						System.out.println("添加图片播放次数失败");
 					}
 				});
 
@@ -365,8 +304,7 @@ public class AiShangApplication extends Application implements Constants {
 	public Cache getCache(int type) {
 		List<Cache> list;
 		try {
-			list = db.findAll(Selector.from(Cache.class)
-					.where("type", "=", type).orderBy("id", true));
+			list = db.findAllByWhere(Cache.class, "type="+type, "id desc");
 			if (list != null && !list.isEmpty()) {
 				return list.get(0);
 			}
@@ -441,17 +379,17 @@ public class AiShangApplication extends Application implements Constants {
 	public List<Video> getVideos() {
 		List<Video> list = null;
 		try {
-			list = db.findAll(Selector.from(Video.class).orderBy("id", true));
+			list = db.findAll(Video.class);
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
-		return list == null ? new ArrayList<Video>() : list;
+		return list;
 	}
 
 	public List<Video> getVideoByType(int type) {
 		List<Video> list = new ArrayList<Video>();
 		try {
-			list = db.findAll(Selector.from(Video.class).where("type", "=", type).orderBy("groupId", false));
+			list = db.findAllByWhere(Video.class,"type="+type,"groupId desc");
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
@@ -460,7 +398,7 @@ public class AiShangApplication extends Application implements Constants {
 
 	public void deleteVideo(int id) {
 		try {
-			db.delete(Video.class, WhereBuilder.b("vid", "=", id));
+			db.deleteByWhere(Video.class, "vid="+id);
 			Log.d("VideoPlayerActivity", "删除视频：" + id);
 		} catch (DbException e) {
 			e.printStackTrace();

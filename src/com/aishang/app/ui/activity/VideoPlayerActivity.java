@@ -3,6 +3,7 @@ package com.aishang.app.ui.activity;
 import java.io.File;
 import java.util.List;
 
+import net.tsz.afinal.FinalBitmap;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
@@ -24,7 +25,6 @@ import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.aishang.app.service.DownloadService;
 import com.aishang.app.ui.base.BaseActivity;
-import com.lidroid.xutils.BitmapUtils;
 
 public class VideoPlayerActivity extends BaseActivity implements Constants, OnCompletionListener {
 
@@ -44,8 +44,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 	private int now_play_stats;
 	private static final int VIDEO = 0;
 	private static final int PICTURE = 1;
-
-	private BitmapUtils bitmapUtil;
+	private FinalBitmap fb;
 	private Handler handler;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +58,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		type = getIntent().getIntExtra("type", 0);
 		mVideoView = (VideoView) v.findViewById(R.id.videoView);
 		mImageView = (TextView) v.findViewById(R.id.adView);
-		
-		bitmapUtil= new BitmapUtils(getApplicationContext());
+		fb = FinalBitmap.create(getApp());
 		mVideoView.setOnCompletionListener(this);
 		mVideoView.requestFocus();
 		videos = getApp().getVideoByType(type);
@@ -122,7 +120,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		}
 		AdPicture adPicture = pictures.get(picturePosition).getAdPicture();
 		getApp().playScrollPicture(adPicture.getAdPicture_id());
-		bitmapUtil.display(mImageView, bce + adPicture.getAdPicture_path());
+		fb.display(mImageView, bce + adPicture.getAdPicture_path());
 		now_play_stats = PICTURE;
 		mImageView.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.GONE);

@@ -3,6 +3,7 @@ package com.aishang.app.ui.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tsz.afinal.FinalBitmap;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,7 +35,6 @@ import com.aishang.app.R;
 import com.aishang.app.common.Constants;
 import com.aishang.app.data.bean.HairStyle;
 import com.aishang.app.ui.base.BaseActivity;
-import com.lidroid.xutils.BitmapUtils;
 
 public class HairShowActivity extends BaseActivity implements Constants, OnScrollListener, OnItemClickListener {
 
@@ -62,7 +62,7 @@ public class HairShowActivity extends BaseActivity implements Constants, OnScrol
 	private boolean isRefreshable = true;
 	private boolean isNew;
 	private List<HairStyle> hairStyles;
-	BitmapUtils bitmapUtil ;
+	private FinalBitmap fb;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,9 +74,7 @@ public class HairShowActivity extends BaseActivity implements Constants, OnScrol
 		button4 = (Button) findViewById(R.id.button4);
 		preparePopupWindow();
 		preparePopupButton();
-		bitmapUtil = new BitmapUtils(getApplicationContext());
-		bitmapUtil.configDiskCacheEnabled(true);
-		bitmapUtil.configMemoryCacheEnabled(true);
+		fb = FinalBitmap.create(getApp());//初始化FinalBitmap模块
 		hairStyles = new ArrayList<HairStyle>();
 		gridView = (GridView) findViewById(R.id.grid);
 		gridView.setOnScrollListener(this);
@@ -251,13 +249,12 @@ public class HairShowActivity extends BaseActivity implements Constants, OnScrol
 			ImageView image;
 			if (convertView == null) {
 				convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item_hair, null);
-				image = (ImageView) convertView.findViewById(R.id.img);
+				image = (ImageView) convertView.findViewById(R.id.imgView);
 				convertView.setTag(image);
 			} else {
 				image = (ImageView) convertView.getTag();
 			}
-			bitmapUtil.configDefaultLoadingImage(R.drawable.p);
-			bitmapUtil.display(image, bce + hairStyles.get(position).getHairStyle_path());
+			fb.display(image, bce + hairStyles.get(position).getHairStyle_path());
 			return convertView;
 		}
 	}

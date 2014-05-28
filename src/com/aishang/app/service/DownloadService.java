@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.tsz.afinal.http.AjaxCallBack;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
@@ -21,9 +22,6 @@ import com.aishang.app.common.Constants;
 import com.aishang.app.db.Video;
 import com.aishang.app.download.DownloadItem;
 import com.aishang.app.download.DownloadManager;
-import com.lidroid.xutils.exception.HttpException;
-import com.lidroid.xutils.http.ResponseInfo;
-import com.lidroid.xutils.http.callback.RequestCallBack;
 
 public class DownloadService extends Service implements Constants {
 
@@ -179,7 +177,7 @@ public class DownloadService extends Service implements Constants {
 		DownloadManager manager = new DownloadManager();
 		System.out.println(item.getFilePath());
 		System.out.println(item.getDownloadUrl());
-		manager.startDownload(item.getDownloadUrl(), item.getFilePath(), new RequestCallBack<File>() {
+		manager.startDownload(item.getDownloadUrl(), item.getFilePath(), new AjaxCallBack<File>() {
 			@Override
 			public void onStart() {
 				System.out.println("onStart");
@@ -188,12 +186,13 @@ public class DownloadService extends Service implements Constants {
 			}
 
 			@Override
-	        public void onFailure(HttpException error, String msg) {
+			public void onFailure(Throwable t, int errorNo, String strMsg) {
 				item.setDownloadState(DOWNLOAD_STATE_FAIL);
 			}
 
+			
 			@Override
-			public void onLoading(long count, long current, boolean isUploading) {
+			public void onLoading(long count, long current) {
 				System.out.println("下载中->" + current + "/" + count);
 
 				mBuilder.setProgress(100, (int) ((float) current / (float) count * 100), false);
@@ -201,7 +200,7 @@ public class DownloadService extends Service implements Constants {
 			}
 
 			@Override
-			public void onSuccess(ResponseInfo<File> responseInfo) {
+			public void onSuccess(File responseInfo) {
 				item.setDownloadState(DOWNLOAD_STATE_SUCCESS);
 				currentDownloadItems.remove(item.getUUID());
 				Video video = new Video();
@@ -212,7 +211,6 @@ public class DownloadService extends Service implements Constants {
 				video.setGroupId(item.arg3);
 
 				application.saveVideo(video);
-				
 				mBuilder.setContentText("Download complete").setProgress(0, 0, false);
 				mNotifyManager.cancel(0);
 

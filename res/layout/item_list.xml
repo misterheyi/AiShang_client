@@ -5,11 +5,12 @@
     android:background="#eeede4"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/img"
+    
+    <ImageView
+        android:id="@+id/imgViewShow"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginRight="2dp">
-    </TextView>
+    </ImageView>
 
 </LinearLayout>
