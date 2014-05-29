@@ -73,13 +73,6 @@
         <!-- 自动播放 -->
         <service android:name="com.aishang.app.service.PlayADService" >
         </service>
-
-        <meta-data
-            android:name="UMENG_APPKEY"
-            android:value="53341c0756240b439f021c14" />
-        <meta-data
-            android:name="UMENG_CHANNEL"
-            android:value="AISHANG" />
     </application>
 
 </manifest>

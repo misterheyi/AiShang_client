@@ -104,7 +104,9 @@ public class AiShangApplication extends Application implements Constants {
 	
 	//获取最新版本
 	public void checkUpdate() {
-		http.get(chechUpdate + "?version=1",
+		AjaxParams params = new AjaxParams();
+		params.put("version","1");
+		http.get(chechUpdate,params,
 				new AjaxCallBack<String>() {
 
 					@Override
@@ -198,6 +200,7 @@ public class AiShangApplication extends Application implements Constants {
 
 					@Override
 					public void onStart() {
+					
 					}
 
 					@Override
@@ -370,7 +373,7 @@ public class AiShangApplication extends Application implements Constants {
 	public void saveVideo(Video video) {
 		try {
 			db.save(video);
-			Log.d("VideoPlayerActivity", "保存视频：" + video.getVid());
+			Log.d("AiShang", "保存视频：" + video.getVid());
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
@@ -399,7 +402,7 @@ public class AiShangApplication extends Application implements Constants {
 	public void deleteVideo(int id) {
 		try {
 			db.deleteByWhere(Video.class, "vid="+id);
-			Log.d("VideoPlayerActivity", "删除视频：" + id);
+			Log.d("AiShang", "删除视频：" + id);
 		} catch (DbException e) {
 			e.printStackTrace();
 		}
@@ -429,7 +432,7 @@ public class AiShangApplication extends Application implements Constants {
 	}
 
 	public void setPlaying(boolean isPlaying) {
-		Log.d("VideoPlayerActivity", "设置播放状态：" + isPlaying);
+		Log.d("AiShang", "设置播放状态：" + isPlaying);
 		this.isPlaying = isPlaying;
 	}
 
@@ -446,7 +449,7 @@ public class AiShangApplication extends Application implements Constants {
 	}
 
 	public void setPlayAD(boolean isPlayAD) {
-		Log.d("VideoPlayerActivity", "设置是否播放：" + isPlayAD);
+		Log.d("AiShang", "设置是否播放：" + isPlayAD);
 		this.isPlayAD = isPlayAD;
 	}
 	

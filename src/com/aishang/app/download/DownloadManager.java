@@ -12,12 +12,11 @@ public class DownloadManager implements Constants {
 
 	private boolean isStop;
 	private HttpHandler<File> mHttpHandler;
-
+	FinalHttp down= new FinalHttp();
 	public DownloadManager startDownload(String url, String toPath, AjaxCallBack<File> downCallBack) {
 		if (downCallBack == null) {
 			throw new RuntimeException("RequestCallBack对象不能为null");
 		} else {
-			FinalHttp down = new FinalHttp();
 			mHttpHandler = down.download(url, toPath, false, downCallBack);
 		}
 

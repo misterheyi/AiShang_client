@@ -57,6 +57,13 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 		status = getIntent().getIntExtra("status", 0);
 		type = getIntent().getIntExtra("type", 0);
 		mVideoView = (VideoView) v.findViewById(R.id.videoView);
+		mVideoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+			@Override
+			public boolean onError(MediaPlayer mp, int what, int extra) {
+				Log.d("AiShang", "视频不能播放:what = "+what + ",extra= "+ extra);
+				return false;
+			}
+		});
 		mImageView = (TextView) v.findViewById(R.id.adView);
 		fb = FinalBitmap.create(getApp());
 		mVideoView.setOnCompletionListener(this);
@@ -150,7 +157,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 
 	@Override
 	public void onCompletion(MediaPlayer mp) {
-		Log.d("VideoPlayerActivity", "onCompletion");
+		Log.d("AiShang", "onCompletion");
 		switch (now_play_stats) {
 		case VIDEO:
 			if (isClick) {
@@ -191,7 +198,7 @@ public class VideoPlayerActivity extends BaseActivity implements Constants, OnCo
 
 	@Override
 	protected void onDestroy() {
-		Log.d("VideoPlayerActivity", "onDestroy");
+		Log.d("AiShang", "onDestroy");
 		getApp().setPlaying(false);
 		getApp().setPriceListDTO(null);
 		super.onDestroy();

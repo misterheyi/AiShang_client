@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aishang.app.R;
@@ -139,19 +140,19 @@ public class MainActivity extends BaseActivity implements Constants {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//				MainActivity.this.runOnUiThread(new Runnable() {
-//					@Override
-//					public void run() {
-//						ScrollPictureDTO adVideoDTO = getApp().getAdPictureDTO();
-//						if(adVideoDTO.getAd() != null && adVideoDTO.getStatus_code() != 500){
-//							List<AdPictureVO> ad4 = adVideoDTO.getAd();
-//							for(int i= 0 ; i<ad4.size() ; i++){
-//								TextView imageView = new TextView(MainActivity.this);
-//								fb.display(imageView, bce + ad4.get(i).getAdPicture().getAdPicture_path());
-//							}
-//						}
-//					}
-//				});
+				MainActivity.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						ScrollPictureDTO adVideoDTO = getApp().getAdPictureDTO();
+						if(adVideoDTO.getAd() != null && adVideoDTO.getStatus_code() != 500){
+							List<AdPictureVO> ad4 = adVideoDTO.getAd();
+							for(int i= 0 ; i<ad4.size() ; i++){
+								ImageView imageView = new ImageView(MainActivity.this);
+								fb.display(imageView, bce + ad4.get(i).getAdPicture().getAdPicture_path());
+							}
+						}
+					}
+				});
 			
 		}
 		

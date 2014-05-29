@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.aishang.app.AiShangApplication;
-import com.umeng.analytics.MobclickAgent;
 
 public class BaseActivity extends Activity {
 	protected PowerManager powerManager = null;
@@ -37,14 +36,12 @@ public class BaseActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		this.wakeLock.acquire();
-		MobclickAgent.onResume(this);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
 		this.wakeLock.release();
-		MobclickAgent.onPause(this);
 	}
 
 	public AiShangApplication getApp() {
