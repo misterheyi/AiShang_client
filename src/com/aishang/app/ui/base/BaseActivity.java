@@ -49,7 +49,7 @@ public class BaseActivity extends Activity {
 	}
 
 	public void adTimeZero() {
-		System.out.println("AD Time Zero");
+		//System.out.println("AD Time Zero");
 		getApp().setAd_time(0);
 	}
 

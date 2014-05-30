@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.aishang.app.NetworkDetector;
 import com.aishang.app.R;
 import com.aishang.app.common.Constants;
+import com.aishang.app.common.DisplayUtils;
 import com.aishang.app.data.bean.HairStyle;
 import com.aishang.app.ui.base.BaseActivity;
 
@@ -254,7 +255,7 @@ public class HairShowActivity extends BaseActivity implements Constants, OnScrol
 			} else {
 				image = (ImageView) convertView.getTag();
 			}
-			fb.display(image, bce + hairStyles.get(position).getHairStyle_path());
+			fb.display(image, bce + hairStyles.get(position).getHairStyle_path(),DisplayUtils.px2dip(getApplicationContext(), (float)218),DisplayUtils.px2dip(getApp(), (float)298));
 			return convertView;
 		}
 	}

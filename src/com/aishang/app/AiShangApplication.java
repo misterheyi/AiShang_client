@@ -373,7 +373,7 @@ public class AiShangApplication extends Application implements Constants {
 	public void saveVideo(Video video) {
 		try {
 			db.save(video);
-			Log.d("AiShang", "保存视频：" + video.getVid());
+			Log.d("AiShang", "保存视频：" + video.getVid()+" 视频类型："+video.getGroupId());
 		} catch (DbException e) {
 			e.printStackTrace();
 		}

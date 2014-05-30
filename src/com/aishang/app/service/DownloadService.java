@@ -55,7 +55,7 @@ public class DownloadService extends Service implements Constants {
 			return super.onStartCommand(intent, flags, startId);
 		}
 		int code = intent.getIntExtra(SERVICE_TYPE_NAME, ERROR_CODE);
-		System.out.println("Service:" + code);
+		//System.out.println("Service:" + code);
 		switch (code) {
 		case START_DOWNLOAD:
 			// 开启下载服务

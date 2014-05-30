@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.aishang.app.R;
 import com.aishang.app.common.Constants;
