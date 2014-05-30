@@ -167,7 +167,8 @@ public class DownloadService extends Service implements Constants {
 			public void onFailure(Throwable t, int errorNo, String strMsg) {
 				Log.d("AiShang", "下载文件失败:"+item.getFileName());
 				t.printStackTrace();
-				item.setDownloadState(DOWNLOAD_STATE_FAIL);
+//				item.setDownloadState(DOWNLOAD_STATE_FAIL);
+				startDownload(null);
 			}
 
 			@Override
