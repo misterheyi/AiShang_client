@@ -136,7 +136,6 @@ public class MainActivity extends BaseActivity implements Constants {
 	}
 
 	class AdUpdate extends BroadcastReceiver{
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 				MainActivity.this.runOnUiThread(new Runnable() {
@@ -152,9 +151,7 @@ public class MainActivity extends BaseActivity implements Constants {
 						}
 					}
 				});
-			
 		}
-		
 	}
 	
 	class Update extends BroadcastReceiver {
@@ -197,6 +194,7 @@ public class MainActivity extends BaseActivity implements Constants {
 				if (!f) {
 					DownloadItem downloadItem = new DownloadItem(DOWNLOAD_PATH_VIDEO);
 					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo().getAdVideo_path());
+					downloadItem.setFileName(adVideo.getAdVideo().getAdVideo_desc());
 					downloadItem.arg1 = adVideo.getAdVideo().getAdVideo_id();
 					downloadItem.arg2 = adVideo.getAdVideo().getAdVideo_type();
 					downloadItem.arg3 = adVideo.getUser().getUserGroup_id();

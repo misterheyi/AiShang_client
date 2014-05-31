@@ -75,24 +75,6 @@ public class DownloadService extends Service implements Constants {
 				startTimerUpdateProgress();
 			}
 			break;
-		case DOWNLOAD_STATE_PAUSE:
-			// 暂停下载
-			break;
-		case DOWNLOAD_STATE_RESUME:
-			// 重新开始
-			break;
-		case DOWNLOAD_STATE_DELETE:
-			// 删除下载
-			break;
-		case DOWNLOAD_STATE_CLEAR:
-			// 清空下载
-			break;
-		case START_DOWNLOAD_LOADITEM:
-			// 数据库中装载下载任务
-			break;
-		case START_DOWNLOAD_ALLPAUSE:
-			// 设置所有下载状态为暂停
-			break;
 		}
 		return super.onStartCommand(intent, flags, startId);
 	}
@@ -175,26 +157,24 @@ public class DownloadService extends Service implements Constants {
 
 	public DownloadManager download(final DownloadItem item) {
 		DownloadManager manager = new DownloadManager();
-		System.out.println(item.getFilePath());
-		System.out.println(item.getDownloadUrl());
 		manager.startDownload(item.getDownloadUrl(), item.getFilePath(), new AjaxCallBack<File>() {
 			@Override
 			public void onStart() {
-				System.out.println("onStart");
-				mBuilder.setContentTitle("Download 文件").setContentText("Download in progress")
-						.setSmallIcon(R.drawable.logo_index);
+				Log.d("AiShang", "开始下载文件："+item.getFileName());
+				mBuilder.setContentTitle("下载文件中...").setContentText(item.getFileName()+"").setSmallIcon(R.drawable.logo_index);
 			}
 
 			@Override
 			public void onFailure(Throwable t, int errorNo, String strMsg) {
-				item.setDownloadState(DOWNLOAD_STATE_FAIL);
+				Log.d("AiShang", "下载文件失败:"+item.getFileName());
+				t.printStackTrace();
+//				item.setDownloadState(DOWNLOAD_STATE_FAIL);
+				startDownload(null);
 			}
 
-			
 			@Override
 			public void onLoading(long count, long current) {
-				System.out.println("下载中->" + current + "/" + count);
-
+				Log.d("AiShang", "下载中->" + current + "/" + count);
 				mBuilder.setProgress(100, (int) ((float) current / (float) count * 100), false);
 				mNotifyManager.notify(0, mBuilder.build());
 			}
@@ -211,9 +191,8 @@ public class DownloadService extends Service implements Constants {
 				video.setGroupId(item.arg3);
 
 				application.saveVideo(video);
-				mBuilder.setContentText("Download complete").setProgress(0, 0, false);
+				mBuilder.setContentText("下载完成").setProgress(0, 0, false);
 				mNotifyManager.cancel(0);
-
 				downloadItems.remove(item);
 				startDownload(null);
 			}

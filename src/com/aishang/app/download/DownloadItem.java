@@ -11,6 +11,7 @@ public class DownloadItem implements Serializable {
 	private String filePath;
 	private String percentage = "0%";
 	private String uuid;
+	private String fileName;
 	public int arg1, arg2 , arg3;
 
 	private DownloadManager downLoadManager;
@@ -69,4 +70,15 @@ public class DownloadItem implements Serializable {
 		this.uuid = uuid;
 	}
 
+	public String getFileName() {
+		if(fileName == null){
+			return "没有文件描述";
+		}
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+	
 }
