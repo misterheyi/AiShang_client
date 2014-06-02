@@ -29,6 +29,7 @@ public class PLADianeiChuxiao extends BaseFragment {
 		loading = v.findViewById(R.id.loading);
 		layout = (LinearLayout) v.findViewById(R.id.layout);
 		fb = FinalBitmap.create(getApp());//初始化FinalBitmap模块
+		fb.configBitmapLoadThreadSize(3);
 		display();
 		IntentFilter filter = new IntentFilter(ACTION_PRICELIST);
 		update = new Update();

@@ -42,8 +42,24 @@ public class DownloadService extends Service implements Constants {
 		downloadItems = new ArrayList<DownloadItem>();
 		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mBuilder = new NotificationCompat.Builder(this);
+		mHandler.post(updateThread);
 	}
+	
+	//创建一个Handler
+    Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+        	application.getAdVideoDTOList();
+        };
+    };
 
+    //创建一个线程
+    Runnable updateThread = new Runnable() {
+        @Override
+        public void run() {
+            mHandler.postDelayed(updateThread, 60*1000);
+        }
+    };
+    
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -51,6 +67,7 @@ public class DownloadService extends Service implements Constants {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		startDownload(null);
 		if (intent == null) {
 			return super.onStartCommand(intent, flags, startId);
 		}
@@ -69,7 +86,7 @@ public class DownloadService extends Service implements Constants {
 			}
 			if(!f){
 				item.setDownloadState(DOWNLOAD_STATE_WATTING);
-				Log.d("VideoPlayerActivity", "添加到下载服务：" + item.arg1);
+				Log.d("AiShang", "添加到下载服务：" + item.arg1);
 				downloadItems.add(item);
 				startDownload(item);
 				startTimerUpdateProgress();
@@ -167,9 +184,9 @@ public class DownloadService extends Service implements Constants {
 			@Override
 			public void onFailure(Throwable t, int errorNo, String strMsg) {
 				Log.d("AiShang", "下载文件失败:"+item.getFileName());
+				mNotifyManager.cancel(0);
 				t.printStackTrace();
 //				item.setDownloadState(DOWNLOAD_STATE_FAIL);
-				startDownload(null);
 			}
 
 			@Override
