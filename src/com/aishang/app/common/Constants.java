@@ -6,9 +6,9 @@ import android.os.Environment;
 
 public interface Constants {
 
-	public static final String host = "http://suona110.vicp.cc:8088/";
+	public static final String host = "http://www.520ashang.com:5000/";
 //	static final String host = "http://192.168.1.102/";
-	public static final String bce = "http://suona110.vicp.cc:8088/";
+	public static final String bce = "http://www.520ashang.com:5000/";
 //	static final String bce = "http://192.168.1.102:80/";
 	static final String api = "api/1.0/";
 //	static final String api = "/api/1.0/";

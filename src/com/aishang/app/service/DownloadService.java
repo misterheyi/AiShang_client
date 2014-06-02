@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import net.tsz.afinal.http.AjaxCallBack;
 import android.app.NotificationManager;
@@ -13,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -33,6 +36,16 @@ public class DownloadService extends Service implements Constants {
 	private NotificationManager mNotifyManager;
 	private NotificationCompat.Builder mBuilder;
 
+	private final Timer timer = new Timer();
+	private TimerTask task = new TimerTask() {
+        @Override
+        public void run() {
+            Message message = new Message();
+            message.what = 1;
+            mHandler.sendMessage(message);
+        }
+    }; 
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -42,7 +55,15 @@ public class DownloadService extends Service implements Constants {
 		downloadItems = new ArrayList<DownloadItem>();
 		mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mBuilder = new NotificationCompat.Builder(this);
+		timer.schedule(task, 2000, 60*1000);
 	}
+	
+	//创建一个Handler
+    Handler mHandler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+        	application.getAdVideoDTOList();
+        };
+    };
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -51,6 +72,7 @@ public class DownloadService extends Service implements Constants {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		startDownload(null);
 		if (intent == null) {
 			return super.onStartCommand(intent, flags, startId);
 		}
@@ -69,7 +91,7 @@ public class DownloadService extends Service implements Constants {
 			}
 			if(!f){
 				item.setDownloadState(DOWNLOAD_STATE_WATTING);
-				Log.d("VideoPlayerActivity", "添加到下载服务：" + item.arg1);
+				Log.d("AiShang", "添加到下载服务：" + item.arg1);
 				downloadItems.add(item);
 				startDownload(item);
 				startTimerUpdateProgress();
@@ -82,6 +104,7 @@ public class DownloadService extends Service implements Constants {
 	@Override
 	public void onDestroy() {
 		handler.removeCallbacks(update);
+		timer.cancel();
 		super.onDestroy();
 	}
 
@@ -167,9 +190,9 @@ public class DownloadService extends Service implements Constants {
 			@Override
 			public void onFailure(Throwable t, int errorNo, String strMsg) {
 				Log.d("AiShang", "下载文件失败:"+item.getFileName());
+				mNotifyManager.cancel(0);
 				t.printStackTrace();
 //				item.setDownloadState(DOWNLOAD_STATE_FAIL);
-				startDownload(null);
 			}
 
 			@Override

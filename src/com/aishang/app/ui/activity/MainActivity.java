@@ -16,7 +16,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.aishang.app.R;
@@ -35,7 +38,7 @@ import com.aishang.app.ui.base.BaseActivity;
 public class MainActivity extends BaseActivity implements Constants {
 
 	private Intent service;
-	private BroadcastReceiver update;
+//	private BroadcastReceiver update;
 	private BroadcastReceiver autoUpdate;
 	private BroadcastReceiver receiver;
 	private BroadcastReceiver isUpdate;
@@ -54,6 +57,7 @@ public class MainActivity extends BaseActivity implements Constants {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		getApp().checkUpdate();
 		fb = FinalBitmap.create(getApp());//初始化FinalBitmap模块
 		initDir();
 	}
@@ -67,12 +71,12 @@ public class MainActivity extends BaseActivity implements Constants {
 		adIntent = new Intent(getApplicationContext(), PlayADService.class);
 		startService(adIntent);
 
-		update = new Update();
-		IntentFilter filter = new IntentFilter(ACTION_ADVIDEO);
-		registerReceiver(update, filter);
-		autoUpdate = new AutoUpdate();
-		IntentFilter filter2 = new IntentFilter(ACTION_AUTO_UPDATE);
-		registerReceiver(autoUpdate, filter2);
+//		update = new Update();
+//		IntentFilter filter = new IntentFilter(ACTION_ADVIDEO);
+//		registerReceiver(update, filter);
+//		autoUpdate = new AutoUpdate();
+//		IntentFilter filter2 = new IntentFilter(ACTION_AUTO_UPDATE);
+//		registerReceiver(autoUpdate, filter2);
 		receiver = new DownloadCompleteReceiver();
 		registerReceiver(receiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 		isUpdate = new AskIsUpdate();
@@ -87,20 +91,29 @@ public class MainActivity extends BaseActivity implements Constants {
 			file.mkdirs();
 		}
 	}
+	
+	
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
+	}
 
 	@Override
 	protected void onResume() {
 		// 重启服务
 		getApp().setPlayAD(true);
-		getApp().getAdVideoDTOList();
 		getApp().getAdPictureDTOList();
 		super.onResume();
 	};
 
 	@Override
 	protected void onDestroy() {
-		unregisterReceiver(update);
-		unregisterReceiver(autoUpdate);
+//		unregisterReceiver(update);
+//		unregisterReceiver(autoUpdate);
 		unregisterReceiver(receiver);
 		unregisterReceiver(isUpdate);
 		stopService(service);
@@ -154,74 +167,71 @@ public class MainActivity extends BaseActivity implements Constants {
 		}
 	}
 	
-	class Update extends BroadcastReceiver {
+//	class Update extends BroadcastReceiver {
+//
+//		@Override
+//		public void onReceive(Context context, Intent intent) {
+//			AdVideoDTO adVideoDTO = getApp().getAdVideoDTO();
+//			List<AdVideoVO> list = adVideoDTO.getVideos();
+//			if (list == null)
+//				return;
+//			List<Video> videos = getApp().getVideos();
+//			if(videos == null)
+//				return;
+//			for (Video video : videos) {
+//				boolean f = false;
+//				for (AdVideoVO ad : list) {
+//					f = video.getVid() == ad.getAdVideo().getAdVideo_id();
+//					if (f)
+//						break;
+//				}
+//				if (!f) {
+//					File file = new File(video.getFilePath());
+//					if (file.exists()) {
+//						file.delete();
+//					}
+//					getApp().deleteVideo(video.getVid());
+//				} else {
+//					System.out.println("保留");
+//				}
+//			}
+//
+//			for (AdVideoVO adVideo : list) {
+//				boolean f = false;
+//				for (Video video : videos) {
+//					f = video.getVid() == adVideo.getAdVideo().getAdVideo_id();
+//					if (f) {
+//						break;
+//					}
+//				}
+//				if (!f) {
+//					DownloadItem downloadItem = new DownloadItem(DOWNLOAD_PATH_VIDEO);
+//					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo().getAdVideo_path());
+//					downloadItem.setFileName(adVideo.getAdVideo().getAdVideo_desc());
+//					downloadItem.arg1 = adVideo.getAdVideo().getAdVideo_id();
+//					downloadItem.arg2 = adVideo.getAdVideo().getAdVideo_type();
+//					downloadItem.arg3 = adVideo.getUser().getUserGroup_id();
+//					Intent i = new Intent(getApplicationContext(), DownloadService.class);
+//					i.putExtra(SERVICE_TYPE_NAME, START_DOWNLOAD);
+//					i.putExtra(DOWNLOAD_INTENT, downloadItem);
+//					startService(i);
+//				} else {
+//					Log.d("AiShang", "该视频无需下载:"+adVideo.getAdVideo().getAdVideo_desc());
+//				}
+//
+//			}
+//
+//		}
+//
+//	}
 
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			AdVideoDTO adVideoDTO = getApp().getAdVideoDTO();
-			List<AdVideoVO> list = adVideoDTO.getVideos();
-			if (list == null)
-				return;
-			List<Video> videos = getApp().getVideos();
-			if(videos == null)
-				return;
-			for (Video video : videos) {
-				boolean f = false;
-				for (AdVideoVO ad : list) {
-					f = video.getVid() == ad.getAdVideo().getAdVideo_id();
-					if (f)
-						break;
-				}
-				if (!f) {
-					File file = new File(video.getFilePath());
-					if (file.exists()) {
-						file.delete();
-					}
-					getApp().deleteVideo(video.getVid());
-				} else {
-					System.out.println("保留");
-				}
-			}
-
-			for (AdVideoVO adVideo : list) {
-				boolean f = false;
-				for (Video video : videos) {
-					f = video.getVid() == adVideo.getAdVideo().getAdVideo_id();
-					if (f) {
-						break;
-					}
-				}
-				if (!f) {
-					DownloadItem downloadItem = new DownloadItem(DOWNLOAD_PATH_VIDEO);
-					downloadItem.setDownloadUrl(bce + adVideo.getAdVideo().getAdVideo_path());
-					downloadItem.setFileName(adVideo.getAdVideo().getAdVideo_desc());
-					downloadItem.arg1 = adVideo.getAdVideo().getAdVideo_id();
-					downloadItem.arg2 = adVideo.getAdVideo().getAdVideo_type();
-					downloadItem.arg3 = adVideo.getUser().getUserGroup_id();
-					Intent i = new Intent(getApplicationContext(), DownloadService.class);
-					i.putExtra(SERVICE_TYPE_NAME, START_DOWNLOAD);
-					i.putExtra(DOWNLOAD_INTENT, downloadItem);
-					startService(i);
-				} else {
-					System.out.println("无需下载");
-				}
-
-			}
-
-		}
-
-	}
-
-	class AutoUpdate extends BroadcastReceiver {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			System.out.println("更新");
-			getApp().getAdVideoDTOList();
-			getApp().checkUpdate();
-		}
-
-	}
+//	class AutoUpdate extends BroadcastReceiver {
+//		@Override
+//		public void onReceive(Context context, Intent intent) {
+//			getApp().checkUpdate();
+//		}
+//
+//	}
 
 	class DownloadCompleteReceiver extends BroadcastReceiver {
 		@Override
@@ -242,12 +252,7 @@ public class MainActivity extends BaseActivity implements Constants {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			System.out.println("AskIsUpdate");
 			Version version = (Version) intent.getSerializableExtra("VERSION");
-			v = version.getVersion();
-			if (v2.equals(v)) {
-				return;
-			}
 			if (builder != null) {
 				return;
 			}
@@ -256,8 +261,6 @@ public class MainActivity extends BaseActivity implements Constants {
 
 	}
 
-	private String v = "";
-	private String v2 = "";
 	private AlertDialog.Builder builder;
 
 	private void down(Version version) {
@@ -286,7 +289,6 @@ public class MainActivity extends BaseActivity implements Constants {
 		});
 		builder.setNegativeButton("取消更新", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int whichButton) {
-				v2 = version.getVersion();
 				builder = null;
 			}
 		});

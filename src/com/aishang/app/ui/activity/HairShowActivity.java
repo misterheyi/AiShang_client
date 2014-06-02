@@ -76,6 +76,8 @@ public class HairShowActivity extends BaseActivity implements Constants, OnScrol
 		preparePopupWindow();
 		preparePopupButton();
 		fb = FinalBitmap.create(getApp());//初始化FinalBitmap模块
+		fb.configBitmapLoadThreadSize(3);
+		fb.configLoadingImage(R.drawable.p);
 		hairStyles = new ArrayList<HairStyle>();
 		gridView = (GridView) findViewById(R.id.grid);
 		gridView.setOnScrollListener(this);

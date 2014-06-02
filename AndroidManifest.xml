@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.aishang.app"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0.0" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -14,8 +14,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_DOWNLOAD_MANAGER" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
-    </uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
         android:name="com.aishang.app.AiShangApplication"
@@ -73,6 +73,13 @@
         <!-- 自动播放 -->
         <service android:name="com.aishang.app.service.PlayADService" >
         </service>
+        
+        <receiver android:name="com.aishang.app.receiver.DownloadVideoReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.aishang.action.advideo"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -105,10 +105,9 @@ public class AiShangApplication extends Application implements Constants {
 	//获取最新版本
 	public void checkUpdate() {
 		AjaxParams params = new AjaxParams();
-		params.put("version","1");
+		params.put("version",getVersion()+"");
 		http.get(chechUpdate,params,
 				new AjaxCallBack<String>() {
-
 					@Override
 					public void onSuccess(String responseStr) {
 						if (TextUtils.isEmpty(responseStr)|| responseStr.toLowerCase(Locale.CHINA).equals("null")) {
@@ -315,10 +314,6 @@ public class AiShangApplication extends Application implements Constants {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public void checkADUpdate() {
-
 	}
 
 	public void installApk(File file) {
