@@ -65,6 +65,14 @@ public class DownloadService extends Service implements Constants {
         };
     };
 
+    //创建一个线程
+    Runnable updateThread = new Runnable() {
+        @Override
+        public void run() {
+            mHandler.postDelayed(updateThread, 60*1000);
+        }
+    };
+    
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
